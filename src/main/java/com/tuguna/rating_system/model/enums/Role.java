@@ -1,0 +1,7 @@
+package com.tuguna.rating_system.model.enums;
+
+public enum Role {
+    ADMIN,
+    SELLER,
+    ANONYMOUS
+}
