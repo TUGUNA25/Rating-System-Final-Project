@@ -1,6 +1,7 @@
 package com.tuguna.rating_system.model.entity;
 
 
+import com.tuguna.rating_system.model.enums.CommentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,7 +24,16 @@ public class Comment {
     private String content;
 
     @Column(nullable = false)
+    private int rating;
+
+    @Builder.Default
+    @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CommentStatus status = CommentStatus.PENDING;
 
     // The seller who receives this comment
     @ManyToOne
@@ -34,4 +44,5 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "author_id")
     private User author;
+
 }

@@ -39,6 +39,12 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(nullable = false)
+    private Double averageRating = 0.0;
+
+    @Column(nullable = false)
+    private Integer ratingsCount = 0;
+
 
 
     // Comments received by this seller (from other sellers or anonymous)
