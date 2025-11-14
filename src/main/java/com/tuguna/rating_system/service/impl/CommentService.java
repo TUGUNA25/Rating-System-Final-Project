@@ -7,6 +7,7 @@ import com.tuguna.rating_system.model.entity.User;
 import com.tuguna.rating_system.model.enums.CommentStatus;
 import com.tuguna.rating_system.repository.CommentRepository;
 import com.tuguna.rating_system.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -17,14 +18,17 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final ModelMapper mapper;
+    private final UserService userService;
 
-    public CommentService(CommentRepository commentRepository, UserRepository userRepository,ModelMapper mapper) {
+    public CommentService(CommentRepository commentRepository, UserRepository userRepository,ModelMapper mapper,UserService userService) {
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.mapper = mapper;
+        this.userService = userService;
     }
 
     public CommentResponseDTO addComment(CommentCreateDTO dto, Long sellerId, Long authorId) {
+
         User seller = userRepository.findById(sellerId)
                 .orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
 
@@ -43,15 +47,7 @@ public class CommentService {
                 .build();
 
         Comment saved = commentRepository.save(comment);
-
-        // 🔥 Map entity → DTO
-        CommentResponseDTO response = mapper.map(saved, CommentResponseDTO.class);
-
-        // Fixing nested objects manually
-        response.setSellerId(saved.getSeller().getId());
-        response.setAuthorId(saved.getAuthor() != null ? saved.getAuthor().getId() : null);
-
-        return response;
+        return mapToResponseDTO(saved);
     }
 
     //comments that seller get from people
@@ -61,14 +57,7 @@ public class CommentService {
 
         List<Comment> comments = commentRepository.findBySellerAndStatus(seller, CommentStatus.APPROVED);
 
-        return comments.stream()
-                .map(comment -> {
-                    CommentResponseDTO dto = mapper.map(comment, CommentResponseDTO.class);
-                    dto.setSellerId(comment.getSeller().getId());
-                    dto.setAuthorId(comment.getAuthor() != null ? comment.getAuthor().getId() : null);
-                    return dto;
-                })
-                .toList();
+        return mapToResponseList(comments);
     }
 
     //comments that seller writes for other sellers profile
@@ -78,14 +67,7 @@ public class CommentService {
 
         List<Comment> comments = commentRepository.findByAuthorAndStatus(author, CommentStatus.APPROVED);
 
-        return comments.stream()
-                .map(comment -> {
-                    CommentResponseDTO dto = mapper.map(comment, CommentResponseDTO.class);
-                    dto.setSellerId(comment.getSeller().getId());
-                    dto.setAuthorId(comment.getAuthor() != null ? comment.getAuthor().getId() : null);
-                    return dto;
-                })
-                .toList();
+        return mapToResponseList(comments);
     }
 
     // get a specific comment
@@ -106,19 +88,58 @@ public class CommentService {
             return null; // temporary, later we do 404
         }
 
-        CommentResponseDTO dto = mapper.map(comment, CommentResponseDTO.class);
-
-        dto.setSellerId(comment.getSeller().getId());
-        dto.setAuthorId(
-                comment.getAuthor() != null ? comment.getAuthor().getId() : null
-        );
-
-        return dto;
+        return mapToResponseDTO(comment);
     }
 
 
     public void deleteComment(Long commentId, Long authorId) {
         // Will add logic
+    }
+
+    public List<CommentResponseDTO> getPendingComments() {
+        List<Comment> pending = commentRepository.findByStatus(CommentStatus.PENDING);
+        return mapToResponseList(pending);
+    }
+
+    @Transactional
+    public CommentResponseDTO approveComment(Long commentId) {
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
+
+        comment.setStatus(CommentStatus.APPROVED);
+
+        userService.updateSellerRating(comment.getSeller());
+
+        return mapToResponseDTO(comment);
+    }
+
+    @Transactional
+    public void rejectPendingComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
+
+        if (comment.getStatus() != CommentStatus.PENDING) {
+            throw new RuntimeException("Only pending comments can be rejected");
+        }
+
+        commentRepository.delete(comment);
+    }
+
+
+
+    // mapping helpers
+    private CommentResponseDTO mapToResponseDTO(Comment comment) {
+        CommentResponseDTO dto = mapper.map(comment, CommentResponseDTO.class);
+        dto.setSellerId(comment.getSeller().getId());
+        dto.setAuthorId(comment.getAuthor() != null ? comment.getAuthor().getId() : null);
+        return dto;
+    }
+
+    private List<CommentResponseDTO> mapToResponseList(List<Comment> comments) {
+        return comments.stream()
+                .map(this::mapToResponseDTO)
+                .toList();
     }
 
 }
