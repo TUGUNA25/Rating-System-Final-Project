@@ -7,6 +7,7 @@ import com.tuguna.rating_system.model.entity.User;
 import com.tuguna.rating_system.model.enums.Role;
 import com.tuguna.rating_system.repository.UserRepository;
 import com.tuguna.rating_system.service.security.JwtService;
+import com.tuguna.rating_system.service.verify.VerificationCodeService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,26 +17,35 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final VerificationCodeService verificationCodeService;
 
-    public AuthService(UserRepository userRepository,PasswordEncoder passwordEncoder,JwtService jwtService){
+    public AuthService(UserRepository userRepository,PasswordEncoder passwordEncoder,JwtService jwtService,VerificationCodeService verificationCodeService){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.verificationCodeService = verificationCodeService;
     }
 
-    public AuthResponse register(RegisterRequest request) {
+
+    public String register(RegisterRequest request) {
         User user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.SELLER)
+                .emailVerified(false)
                 .build();
 
         userRepository.save(user);
 
-        String token = jwtService.generateToken(user.getId());
-        return new AuthResponse(token);
+        String code = verificationCodeService.generateAndStoreCode(user.getId());
+
+        String confirmationLink = "http://localhost:8080/auth/confirm?code=" + code;
+
+        System.out.println("CONFIRMATION LINK: " + confirmationLink);
+
+        return "Registration successful! Please check your email to confirm your account.";
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -44,6 +54,10 @@ public class AuthService {
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid email or password");
+        }
+
+        if (!user.getEmailVerified()) {
+            throw new RuntimeException("Please confirm your email before logging in.");
         }
 
         String token = jwtService.generateToken(user.getId());

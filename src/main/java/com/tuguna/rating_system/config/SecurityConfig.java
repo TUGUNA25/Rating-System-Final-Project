@@ -42,6 +42,7 @@ public class SecurityConfig {
 
                 // 5) Authorization rules
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
                         .requestMatchers("/comments/**").permitAll()

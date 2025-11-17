@@ -38,6 +38,10 @@ public class User {
 
     @Builder.Default
     @Column(nullable = false)
+    private Boolean emailVerified = false;
+
+    @Builder.Default
+    @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Builder.Default
