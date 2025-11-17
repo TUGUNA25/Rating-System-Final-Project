@@ -33,6 +33,15 @@ public class AdminCommentController {
     }
 
     /**
+     * Delete any comment
+     */
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<String> adminDeleteComment(@PathVariable Long commentId) {
+        commentService.adminDeleteComment(commentId);
+        return ResponseEntity.ok("Comment deleted by admin");
+    }
+
+    /**
      * Reject a pending comment (delete it)
      */
     @DeleteMapping("/{commentId}/reject")
@@ -40,4 +49,5 @@ public class AdminCommentController {
         commentService.rejectPendingComment(commentId);
         return ResponseEntity.ok("Comment rejected and deleted");
     }
+
 }

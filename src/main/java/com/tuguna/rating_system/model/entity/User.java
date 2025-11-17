@@ -36,12 +36,15 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
+    @Builder.Default
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Builder.Default
     @Column(nullable = false)
     private Double averageRating = 0.0;
 
+    @Builder.Default
     @Column(nullable = false)
     private Integer ratingsCount = 0;
 

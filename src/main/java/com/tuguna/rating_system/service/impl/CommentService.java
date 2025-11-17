@@ -7,8 +7,10 @@ import com.tuguna.rating_system.model.entity.User;
 import com.tuguna.rating_system.model.enums.CommentStatus;
 import com.tuguna.rating_system.repository.CommentRepository;
 import com.tuguna.rating_system.repository.UserRepository;
+import com.tuguna.rating_system.service.security.CustomUserDetails;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,22 +29,25 @@ public class CommentService {
         this.userService = userService;
     }
 
-    public CommentResponseDTO addComment(CommentCreateDTO dto, Long sellerId, Long authorId) {
+    public CommentResponseDTO addComment(CommentCreateDTO dto, Long sellerId) {
 
-        User seller = userRepository.findById(sellerId)
-                .orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
+        User seller = userRepository.findById(sellerId).orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
+
+        // user from JWT
+        CustomUserDetails currentUser = getCurrentUser();
 
         User author = null;
-        if (authorId != null) {
-            author = userRepository.findById(authorId)
-                    .orElseThrow(() -> new RuntimeException("Author not found with id: " + authorId));
+        if (currentUser != null) {
+            Long userId = currentUser.getId();
+            author = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
         }
 
         Comment comment = Comment.builder()
                 .content(dto.getContent())
                 .rating(dto.getRating())
                 .seller(seller)
-                .author(author)
+                .author(author)   // null if not logged in
                 .status(CommentStatus.PENDING)
                 .build();
 
@@ -52,8 +57,7 @@ public class CommentService {
 
     //comments that seller get from people
     public List<CommentResponseDTO> getCommentsForSeller(Long sellerId) {
-        User seller = userRepository.findById(sellerId)
-                .orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
+        User seller = userRepository.findById(sellerId).orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
 
         List<Comment> comments = commentRepository.findBySellerAndStatus(seller, CommentStatus.APPROVED);
 
@@ -62,8 +66,7 @@ public class CommentService {
 
     //comments that seller writes for other sellers profile
     public List<CommentResponseDTO> getCommentsWrittenBySeller(Long sellerId) {
-        User author = userRepository.findById(sellerId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + sellerId));
+        User author = userRepository.findById(sellerId).orElseThrow(() -> new RuntimeException("User not found with id: " + sellerId));
 
         List<Comment> comments = commentRepository.findByAuthorAndStatus(author, CommentStatus.APPROVED);
 
@@ -72,30 +75,45 @@ public class CommentService {
 
     // get a specific comment
     public CommentResponseDTO getSpecificComment(Long sellerId, Long commentId) {
-        User seller = userRepository.findById(sellerId).orElse(null);
-        if (seller == null) {
-            return null; // temporary, later we do 404
-        }
 
-        // 2. Find comment belonging to seller AND approved
+        User seller = userRepository.findById(sellerId).orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
         Comment comment = commentRepository.findByIdAndSellerAndStatus(
-                commentId,
-                seller,
-                CommentStatus.APPROVED
-        ).orElse(null);
-
-        if (comment == null) {
-            return null; // temporary, later we do 404
-        }
+                        commentId,
+                        seller,
+                        CommentStatus.APPROVED
+                ).orElseThrow(() -> new RuntimeException("Approved comment not found"));
 
         return mapToResponseDTO(comment);
     }
 
+    @Transactional
+    public void deleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
 
-    public void deleteComment(Long commentId, Long authorId) {
-        // Will add logic
+        CustomUserDetails userDetails = getCurrentUser();
+
+        if (userDetails == null) {
+            throw new RuntimeException("You must be logged in to delete comments");
+        }
+
+        Long userId = userDetails.getId();
+
+        if (comment.getAuthor() == null || !comment.getAuthor().getId().equals(userId)) {
+            throw new RuntimeException("You are not allowed to delete this comment");
+        }
+        User seller = comment.getSeller();
+        commentRepository.delete(comment);
+        userService.updateSellerRating(seller);
     }
 
+    @Transactional
+    public void adminDeleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("Comment not found"));
+        User seller = comment.getSeller(); // store before delete
+        commentRepository.delete(comment);
+        userService.updateSellerRating(seller);
+    }
     public List<CommentResponseDTO> getPendingComments() {
         List<Comment> pending = commentRepository.findByStatus(CommentStatus.PENDING);
         return mapToResponseList(pending);
@@ -104,8 +122,7 @@ public class CommentService {
     @Transactional
     public CommentResponseDTO approveComment(Long commentId) {
 
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("Comment not found"));
 
         comment.setStatus(CommentStatus.APPROVED);
 
@@ -116,8 +133,7 @@ public class CommentService {
 
     @Transactional
     public void rejectPendingComment(Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("Comment not found"));
 
         if (comment.getStatus() != CommentStatus.PENDING) {
             throw new RuntimeException("Only pending comments can be rejected");
@@ -142,4 +158,23 @@ public class CommentService {
                 .toList();
     }
 
+    private CustomUserDetails getCurrentUser() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated()) {
+            return null;
+        }
+
+        Object principal = auth.getPrincipal();
+
+        if (principal instanceof CustomUserDetails userDetails) {
+            return userDetails;
+        }
+
+        if (principal instanceof String s && s.equals("anonymousUser")) {
+            return null;
+        }
+
+        return null;
+    }
 }

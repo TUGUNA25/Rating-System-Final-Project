@@ -7,7 +7,6 @@ import com.tuguna.rating_system.model.entity.User;
 import com.tuguna.rating_system.model.enums.Role;
 import com.tuguna.rating_system.repository.UserRepository;
 import com.tuguna.rating_system.service.security.JwtService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
