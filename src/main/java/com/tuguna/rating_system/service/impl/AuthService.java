@@ -7,6 +7,7 @@ import com.tuguna.rating_system.model.entity.User;
 import com.tuguna.rating_system.model.enums.Role;
 import com.tuguna.rating_system.repository.UserRepository;
 import com.tuguna.rating_system.service.security.JwtService;
+import com.tuguna.rating_system.service.verify.EmailService;
 import com.tuguna.rating_system.service.verify.VerificationCodeService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,12 +19,14 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final VerificationCodeService verificationCodeService;
+    private final EmailService emailService;
 
-    public AuthService(UserRepository userRepository,PasswordEncoder passwordEncoder,JwtService jwtService,VerificationCodeService verificationCodeService){
+    public AuthService(UserRepository userRepository,PasswordEncoder passwordEncoder,JwtService jwtService,VerificationCodeService verificationCodeService,EmailService emailService){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.verificationCodeService = verificationCodeService;
+        this.emailService = emailService;
     }
 
 
@@ -43,7 +46,7 @@ public class AuthService {
 
         String confirmationLink = "http://localhost:8080/auth/confirm?code=" + code;
 
-        System.out.println("CONFIRMATION LINK: " + confirmationLink);
+        emailService.sendVerificationEmail(user.getEmail(), confirmationLink);
 
         return "Registration successful! Please check your email to confirm your account.";
     }
