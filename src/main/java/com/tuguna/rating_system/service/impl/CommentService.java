@@ -1,7 +1,7 @@
 package com.tuguna.rating_system.service.impl;
 
-import com.tuguna.rating_system.dto.comment.CommentCreateDTO;
-import com.tuguna.rating_system.dto.comment.CommentResponseDTO;
+import com.tuguna.rating_system.dto.comment.CommentCreate;
+import com.tuguna.rating_system.dto.comment.CommentResponse;
 import com.tuguna.rating_system.model.entity.Comment;
 import com.tuguna.rating_system.model.entity.User;
 import com.tuguna.rating_system.model.enums.CommentStatus;
@@ -10,7 +10,6 @@ import com.tuguna.rating_system.repository.UserRepository;
 import com.tuguna.rating_system.service.security.CustomUserDetails;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,12 +28,12 @@ public class CommentService {
         this.userService = userService;
     }
 
-    public CommentResponseDTO addComment(CommentCreateDTO dto, Long sellerId) {
+    public CommentResponse addComment(CommentCreate dto, Long sellerId) {
 
         User seller = userRepository.findById(sellerId).orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
 
         // user from JWT
-        CustomUserDetails currentUser = getCurrentUser();
+        CustomUserDetails currentUser = userService.getCurrentUser();
 
         User author = null;
         if (currentUser != null) {
@@ -56,7 +55,7 @@ public class CommentService {
     }
 
     //comments that seller get from people
-    public List<CommentResponseDTO> getCommentsForSeller(Long sellerId) {
+    public List<CommentResponse> getCommentsForSeller(Long sellerId) {
         User seller = userRepository.findById(sellerId).orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
 
         List<Comment> comments = commentRepository.findBySellerAndStatus(seller, CommentStatus.APPROVED);
@@ -65,7 +64,8 @@ public class CommentService {
     }
 
     //comments that seller writes for other sellers profile
-    public List<CommentResponseDTO> getCommentsWrittenBySeller(Long sellerId) {
+    // gadasaweria !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    public List<CommentResponse> getCommentsWrittenBySeller(Long sellerId) {
         User author = userRepository.findById(sellerId).orElseThrow(() -> new RuntimeException("User not found with id: " + sellerId));
 
         List<Comment> comments = commentRepository.findByAuthorAndStatus(author, CommentStatus.APPROVED);
@@ -74,7 +74,7 @@ public class CommentService {
     }
 
     // get a specific comment
-    public CommentResponseDTO getSpecificComment(Long sellerId, Long commentId) {
+    public CommentResponse getSpecificComment(Long sellerId, Long commentId) {
 
         User seller = userRepository.findById(sellerId).orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
         Comment comment = commentRepository.findByIdAndSellerAndStatus(
@@ -91,7 +91,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
 
-        CustomUserDetails userDetails = getCurrentUser();
+        CustomUserDetails userDetails = userService.getCurrentUser();
 
         if (userDetails == null) {
             throw new RuntimeException("You must be logged in to delete comments");
@@ -114,13 +114,13 @@ public class CommentService {
         commentRepository.delete(comment);
         userService.updateSellerRating(seller);
     }
-    public List<CommentResponseDTO> getPendingComments() {
+    public List<CommentResponse> getPendingComments() {
         List<Comment> pending = commentRepository.findByStatus(CommentStatus.PENDING);
         return mapToResponseList(pending);
     }
 
     @Transactional
-    public CommentResponseDTO approveComment(Long commentId) {
+    public CommentResponse approveComment(Long commentId) {
 
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("Comment not found"));
 
@@ -145,36 +145,18 @@ public class CommentService {
 
 
     // mapping helpers
-    private CommentResponseDTO mapToResponseDTO(Comment comment) {
-        CommentResponseDTO dto = mapper.map(comment, CommentResponseDTO.class);
+    private CommentResponse mapToResponseDTO(Comment comment) {
+        CommentResponse dto = mapper.map(comment, CommentResponse.class);
         dto.setSellerId(comment.getSeller().getId());
         dto.setAuthorId(comment.getAuthor() != null ? comment.getAuthor().getId() : null);
         return dto;
     }
 
-    private List<CommentResponseDTO> mapToResponseList(List<Comment> comments) {
+    private List<CommentResponse> mapToResponseList(List<Comment> comments) {
         return comments.stream()
                 .map(this::mapToResponseDTO)
                 .toList();
     }
 
-    private CustomUserDetails getCurrentUser() {
-        var auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !auth.isAuthenticated()) {
-            return null;
-        }
-
-        Object principal = auth.getPrincipal();
-
-        if (principal instanceof CustomUserDetails userDetails) {
-            return userDetails;
-        }
-
-        if (principal instanceof String s && s.equals("anonymousUser")) {
-            return null;
-        }
-
-        return null;
-    }
 }

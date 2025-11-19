@@ -22,10 +22,8 @@ public class Game {
     @Column(nullable = false, unique = true)
     private String title;
 
-    private String genre;
-    private Double price;
-    private String platform; // e.g., PC, Xbox, PlayStation
 
-    @ManyToMany(mappedBy = "games")
-    private Set<User> sellers;
+    // All objects/items that belong to this game
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = false)
+    private Set<GameObject> objects;
 }

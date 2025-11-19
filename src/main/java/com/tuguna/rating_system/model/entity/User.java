@@ -53,7 +53,6 @@ public class User {
     private Integer ratingsCount = 0;
 
 
-
     // Comments received by this seller (from other sellers or anonymous)
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> receivedComments;
@@ -62,12 +61,8 @@ public class User {
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> writtenComments;
 
-    // Games this seller sells (many-to-many)
-    @ManyToMany
-    @JoinTable(
-            name = "user_game_objects",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "game_object_id")
-    )
-    private Set<Game> games;
+    //GAME Objects of this user
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<GameObject> objects;
+
 }
