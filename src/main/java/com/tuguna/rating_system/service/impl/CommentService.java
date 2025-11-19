@@ -87,6 +87,25 @@ public class CommentService {
     }
 
     @Transactional
+    public CommentResponse updateComment(Long commentId, CommentCreate dto) {
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
+
+        // Update fields
+        if (dto.getContent() != null) {
+            comment.setContent(dto.getContent());
+        }
+
+        if (dto.getRating() != 0) {
+            comment.setRating(dto.getRating());
+            userService.updateSellerRating(comment.getSeller());
+        }
+
+        return mapToResponseDTO(comment);
+    }
+
+    @Transactional
     public void deleteComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));

@@ -44,9 +44,19 @@ public class CommentController {
     public CommentResponse getSpecificComment(@PathVariable Long sellerId, @PathVariable Long commentId) {
         return commentService.getSpecificComment(sellerId, commentId);
     }
+
+    //  Update SPECIFIC COMMENT
+    //  /users/{sellerId}/comments/{commentId}
+    @PutMapping("/{commentId}")
+    @PreAuthorize("@commentPermission.canEdit(#commentId, authentication.principal.id)")
+    public CommentResponse updateComment(@PathVariable Long commentId, @RequestBody CommentCreate dto) {
+        return commentService.updateComment(commentId, dto);
+    }
+
     // delete comment
     // /users/{sellerId}/comments/{commentId}
     @DeleteMapping("/{commentId}")
+    @PreAuthorize("@commentPermission.canEdit(#commentId, authentication.principal.id)")
     public ResponseEntity<String> deleteComment(@PathVariable Long commentId) {
         commentService.deleteComment(commentId);
         return ResponseEntity.ok("Comment deleted successfully");

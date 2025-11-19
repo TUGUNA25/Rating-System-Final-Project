@@ -46,13 +46,20 @@ public class SecurityConfig {
                         // -------------------------
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/users/**").permitAll()
-                        .requestMatchers("/comments/**").permitAll()
                         .requestMatchers("/sellers/**").permitAll()
 
-                        // -------------------------
+                        // PUBLIC comment endpoints
+                        .requestMatchers(HttpMethod.GET, "/users/*/comments/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/users/*/comments/**").permitAll()
+
+                        // Seller-only endpoint for written comments
+                        .requestMatchers(HttpMethod.GET, "/users/*/comments/written").authenticated()
+
+                        // Author-only delete/update (checked by @PreAuthorize)
+                        .requestMatchers(HttpMethod.PUT, "/users/*/comments/*").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/users/*/comments/*").authenticated()
+
                         // GAME OBJECT ENDPOINTS
-                        // -------------------------
 
                         // Public
                         .requestMatchers(HttpMethod.GET, "/object", "/object/*").permitAll()
