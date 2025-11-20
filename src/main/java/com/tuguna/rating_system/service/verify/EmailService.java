@@ -18,4 +18,13 @@ public class EmailService {
 
         mailSender.send(message);
     }
+    public void sendPasswordResetEmail(String to, String code) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Password Reset Request");
+
+        message.setText("Use this code to reset your password:\n\n" + code + "\n\nThis code is valid for 10 minutes.");
+
+        mailSender.send(message);
+    }
 }

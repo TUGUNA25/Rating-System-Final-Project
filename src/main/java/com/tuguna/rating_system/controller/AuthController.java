@@ -1,9 +1,7 @@
 package com.tuguna.rating_system.controller;
 
 import com.tuguna.rating_system.dto.ApiResponse;
-import com.tuguna.rating_system.dto.auth.AuthResponse;
-import com.tuguna.rating_system.dto.auth.LoginRequest;
-import com.tuguna.rating_system.dto.auth.RegisterRequest;
+import com.tuguna.rating_system.dto.auth.*;
 import com.tuguna.rating_system.service.impl.AuthService;
 import com.tuguna.rating_system.service.verify.VerificationCodeService;
 import jakarta.validation.Valid;
@@ -35,6 +33,18 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
         AuthResponse auth = authService.login(request);
         return ResponseEntity.ok(ApiResponse.success("Login successful!", auth));
+    }
+
+    @PostMapping("/reset")
+    public ResponseEntity<ApiResponse<String>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        String message = authService.resetPassword(request.getCode(), request.getNewPassword());
+        return ResponseEntity.ok(ApiResponse.success(message, null));
+    }
+
+    @PostMapping("/forgot_password")
+    public ResponseEntity<ApiResponse<String>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        String message = authService.forgotPassword(request.getEmail());
+        return ResponseEntity.ok(ApiResponse.success(message, null));
     }
 
     @GetMapping("/confirm")

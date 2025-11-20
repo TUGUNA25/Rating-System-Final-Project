@@ -70,4 +70,23 @@ public class AuthService {
         String token = jwtService.generateToken(user.getId());
         return new AuthResponse(token);
     }
+
+    public String resetPassword(String code, String newPassword) {
+        Long userId = verificationCodeService.getUserIdByResetCode(code);
+        if (userId == null) {
+            throw new ApiException(ErrorCode.INVALID_CODE, "Invalid or expired reset code");
+        }
+        User user = userRepository.findById(userId).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND, "User not found"));
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        verificationCodeService.deleteResetCode(code);
+        return "Password has been successfully reset!";
+    }
+
+    public String forgotPassword(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND, "User not found with this email"));
+        String code = verificationCodeService.generateResetCode(user.getId());
+        emailService.sendPasswordResetEmail(email, code);
+        return "Password reset code has been sent to your email.";
+    }
 }

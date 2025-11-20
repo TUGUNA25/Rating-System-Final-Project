@@ -44,6 +44,7 @@ public class VerificationCodeService {
         redisTemplate.delete(key);
     }
 
+
     @Transactional
     public String confirmEmail(String code) {
         Long userId = getUserIdByCode(code);
@@ -59,6 +60,23 @@ public class VerificationCodeService {
         return "Email confirmed!";
     }
 
+
+    public String generateResetCode(Long userId) {
+        String code = String.format("%06d", new java.util.Random().nextInt(999999));
+        String key = "passwordReset:" + code;
+        redisTemplate.opsForValue().set(key, userId.toString(), 10, TimeUnit.MINUTES);
+        return code;
+    }
+
+    public Long getUserIdByResetCode(String code) {
+        String key = "passwordReset:" + code;
+        String userId = redisTemplate.opsForValue().get(key);
+        return userId == null ? null : Long.valueOf(userId);
+    }
+
+    public void deleteResetCode(String code) {
+        redisTemplate.delete("passwordReset:" + code);
+    }
 
 
 
