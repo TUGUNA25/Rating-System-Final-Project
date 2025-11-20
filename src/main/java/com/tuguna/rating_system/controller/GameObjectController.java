@@ -1,9 +1,12 @@
 package com.tuguna.rating_system.controller;
 
-import com.tuguna.rating_system.dto.gameobject.GameObjectRequest;
+import com.tuguna.rating_system.dto.ApiResponse;
+import com.tuguna.rating_system.dto.gameobject.GameObjectCreateRequest;
 import com.tuguna.rating_system.dto.gameobject.GameObjectResponse;
+import com.tuguna.rating_system.dto.gameobject.GameObjectUpdateRequest;
 import com.tuguna.rating_system.service.impl.GameObjectService;
 import com.tuguna.rating_system.service.impl.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +26,9 @@ public class GameObjectController {
     // POST /object
     // ----------------------------------------------------
     @PostMapping
-    public GameObjectResponse create(@RequestBody GameObjectRequest request) {
-        return gameObjectService.create(request);
+    public ApiResponse<GameObjectResponse> create(@Valid @RequestBody GameObjectCreateRequest request) {
+        GameObjectResponse response = gameObjectService.create(request);
+        return ApiResponse.success("Object created successfully", response);
     }
 
     // ----------------------------------------------------
@@ -32,8 +36,8 @@ public class GameObjectController {
     // GET /object
     // ----------------------------------------------------
     @GetMapping
-    public List<GameObjectResponse> getAll() {
-        return gameObjectService.getAll();
+    public ApiResponse<List<GameObjectResponse>> getAll() {
+        return ApiResponse.success("All objects fetched successfully", gameObjectService.getAll());
     }
 
     // ----------------------------------------------------
@@ -41,8 +45,8 @@ public class GameObjectController {
     // GET /object/my
     // ----------------------------------------------------
     @GetMapping("/my")
-    public List<GameObjectResponse> getMyObjects() {
-        return gameObjectService.getMyObjects();
+    public ApiResponse<List<GameObjectResponse>> getMyObjects() {
+        return ApiResponse.success("Your objects fetched successfully", gameObjectService.getMyObjects());
     }
 
     // ----------------------------------------------------
@@ -50,8 +54,9 @@ public class GameObjectController {
     // GET /object/{id}
     // ----------------------------------------------------
     @GetMapping("/{id}")
-    public GameObjectResponse getById(@PathVariable Long id) {
-        return gameObjectService.getById(id);
+    public ApiResponse<GameObjectResponse> getById(@PathVariable Long id) {
+        GameObjectResponse object = gameObjectService.getById(id);
+        return ApiResponse.success("Object fetched successfully", object);
     }
 
     // ----------------------------------------------------
@@ -60,11 +65,9 @@ public class GameObjectController {
     // ----------------------------------------------------
     @PutMapping("/{id}")
     @PreAuthorize("@gameObjectPermission.canEdit(#id, authentication.principal.id)")
-    public GameObjectResponse update(
-            @PathVariable Long id,
-            @RequestBody GameObjectRequest request
-    ) {
-        return gameObjectService.update(id, request);
+    public ApiResponse<GameObjectResponse> update(@PathVariable Long id, @Valid @RequestBody GameObjectUpdateRequest request) {
+        GameObjectResponse updated = gameObjectService.update(id, request);
+        return ApiResponse.success("Object updated successfully", updated);
     }
 
     // ----------------------------------------------------
@@ -73,7 +76,8 @@ public class GameObjectController {
     // ----------------------------------------------------
     @DeleteMapping("/{id}")
     @PreAuthorize("@gameObjectPermission.canEdit(#id, authentication.principal.id)")
-    public void delete(@PathVariable Long id) {
+    public ApiResponse<Void> delete(@PathVariable Long id) {
         gameObjectService.delete(id);
+        return ApiResponse.success("Object deleted successfully", null);
     }
 }

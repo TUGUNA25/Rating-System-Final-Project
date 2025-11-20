@@ -3,6 +3,8 @@ package com.tuguna.rating_system.service.impl;
 import com.tuguna.rating_system.dto.auth.AuthResponse;
 import com.tuguna.rating_system.dto.auth.LoginRequest;
 import com.tuguna.rating_system.dto.auth.RegisterRequest;
+import com.tuguna.rating_system.exception.ApiException;
+import com.tuguna.rating_system.exception.ErrorCode;
 import com.tuguna.rating_system.model.entity.User;
 import com.tuguna.rating_system.model.enums.Role;
 import com.tuguna.rating_system.repository.UserRepository;
@@ -31,6 +33,9 @@ public class AuthService {
 
 
     public String register(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new ApiException(ErrorCode.EMAIL_ALREADY_EXISTS, "User with this email already exists");
+        }
         User user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
@@ -52,15 +57,14 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new ApiException(ErrorCode.INVALID_CREDENTIALS, "Invalid email or password"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
+            throw new ApiException(ErrorCode.INVALID_CREDENTIALS, "Invalid email or password");
         }
 
         if (!user.getEmailVerified()) {
-            throw new RuntimeException("Please confirm your email before logging in.");
+            throw new ApiException(ErrorCode.EMAIL_NOT_VERIFIED, "Please confirm your email before logging in.");
         }
 
         String token = jwtService.generateToken(user.getId());

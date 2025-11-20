@@ -1,7 +1,10 @@
 package com.tuguna.rating_system.service.impl;
 
-import com.tuguna.rating_system.dto.gameobject.GameObjectRequest;
+import com.tuguna.rating_system.dto.gameobject.GameObjectCreateRequest;
 import com.tuguna.rating_system.dto.gameobject.GameObjectResponse;
+import com.tuguna.rating_system.dto.gameobject.GameObjectUpdateRequest;
+import com.tuguna.rating_system.exception.ApiException;
+import com.tuguna.rating_system.exception.ErrorCode;
 import com.tuguna.rating_system.model.entity.Game;
 import com.tuguna.rating_system.model.entity.GameObject;
 import com.tuguna.rating_system.model.entity.User;
@@ -24,12 +27,12 @@ public class GameObjectService {
     private final UserService userService;
     private final ModelMapper mapper;
 
-    public GameObjectResponse create(GameObjectRequest request) {
+    public GameObjectResponse create(GameObjectCreateRequest request) {
 
         Long sellerId = userService.getCurrentUser().getId();
 
-        User seller = userRepository.findById(sellerId).orElseThrow(() -> new RuntimeException("User not found"));
-        Game game = gameRepository.findById(request.getGameId()).orElseThrow(() -> new RuntimeException("Game not found"));
+        User seller = userRepository.findById(sellerId).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND, "User not found"));
+        Game game = gameRepository.findById(request.getGameId()).orElseThrow(() -> new ApiException(ErrorCode.GAME_NOT_FOUND, "Game not found with id: " + request.getGameId()));
 
         User sellerRef = User.builder().id(sellerId).build();
 
@@ -49,9 +52,8 @@ public class GameObjectService {
     // UPDATE
     // -----------------------------
     @Transactional
-    public GameObjectResponse update(Long id, GameObjectRequest request) {
-        GameObject object = gameObjectRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Object not found"));
+    public GameObjectResponse update(Long id, GameObjectUpdateRequest request) {
+        GameObject object = gameObjectRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.GAME_OBJECT_NOT_FOUND, "Game object not found"));
 
         if (request.getName() != null) {
             object.setName(request.getName());
@@ -62,7 +64,7 @@ public class GameObjectService {
         }
 
         if (request.getGameId() != null) {
-            Game newGame = gameRepository.findById(request.getGameId()).orElseThrow(() -> new RuntimeException("Game not found with id: " + request.getGameId()));
+            Game newGame = gameRepository.findById(request.getGameId()).orElseThrow(() -> new ApiException(ErrorCode.GAME_NOT_FOUND, "Game not found with id: " + request.getGameId()));
             object.setGame(newGame);
         }
         return toResponse(object);
@@ -73,9 +75,7 @@ public class GameObjectService {
     // -----------------------------
     @Transactional
     public void delete(Long id) {
-
-        GameObject object = gameObjectRepository.findById(id).orElseThrow(() -> new RuntimeException("Object not found"));
-
+        GameObject object = gameObjectRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.GAME_OBJECT_NOT_FOUND, "Game object not found"));
         gameObjectRepository.delete(object);
     }
 
@@ -94,7 +94,7 @@ public class GameObjectService {
     }
 
     public GameObjectResponse getById(Long id) {
-        GameObject object = gameObjectRepository.findById(id).orElseThrow(() -> new RuntimeException("Object not found"));
+        GameObject object = gameObjectRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.GAME_OBJECT_NOT_FOUND, "Object not found"));
         return toResponse(object);
     }
 

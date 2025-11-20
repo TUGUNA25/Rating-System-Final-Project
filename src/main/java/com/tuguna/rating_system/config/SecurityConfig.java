@@ -11,7 +11,9 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
@@ -38,6 +40,11 @@ public class SecurityConfig {
                 // 4) Disable form login / logout to avoid interfering with POST requests
                 .formLogin(form -> form.disable())
                 .logout(logout -> logout.disable())
+
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customAuthEntryPoint())   // 401
+                        .accessDeniedHandler(customAccessDeniedHandler())   // 403
+                )
 
                 // 5) Authorization rules
                 .authorizeHttpRequests(auth -> auth
@@ -92,5 +99,35 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationEntryPoint customAuthEntryPoint() {
+        return (request, response, authException) -> {
+            response.setStatus(401);
+            response.setContentType("application/json");
+            response.getWriter().write("""
+        {
+          "status": 401,
+          "errorCode": "UNAUTHORIZED",
+          "message": "You must be logged in to access this resource"
+        }
+        """);
+        };
+    }
+
+    @Bean
+    public AccessDeniedHandler customAccessDeniedHandler() {
+        return (request, response, accessDeniedException) -> {
+            response.setStatus(403);
+            response.setContentType("application/json");
+            response.getWriter().write("""
+        {
+          "status": 403,
+          "errorCode": "ACCESS_DENIED",
+          "message": "You do not have permission to perform this action"
+        }
+        """);
+        };
     }
 }
