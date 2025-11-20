@@ -1,6 +1,8 @@
 package com.tuguna.rating_system.service.impl;
 
 import com.tuguna.rating_system.dto.game.GameResponse;
+import com.tuguna.rating_system.exception.ApiException;
+import com.tuguna.rating_system.exception.ErrorCode;
 import com.tuguna.rating_system.model.entity.Game;
 import com.tuguna.rating_system.repository.GameRepository;
 import jakarta.transaction.Transactional;
@@ -21,6 +23,8 @@ public class GameService {
     // CREATE
     // -----------------------------
     public GameResponse create(String title) {
+        if (gameRepository.existsByTitleIgnoreCase(title)) {throw new ApiException(ErrorCode.GAME_TITLE_EXISTS, "Game with this title already exists");
+        }
         Game game = Game.builder()
                 .title(title)
                 .build();
@@ -34,10 +38,25 @@ public class GameService {
     // -----------------------------
     @Transactional
     public GameResponse update(Long id, String newTitle) {
-        Game game = gameRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Game not found"));
 
-        game.setTitle(newTitle);
+        Game game = gameRepository.findById(id)
+                .orElseThrow(() -> new ApiException(
+                        ErrorCode.GAME_NOT_FOUND,
+                        "Game not found"
+                ));
+
+        if (newTitle != null && !newTitle.equals(game.getTitle())) {
+
+            if (gameRepository.existsByTitleIgnoreCase(newTitle)) {
+                throw new ApiException(
+                        ErrorCode.GAME_TITLE_EXISTS,
+                        "Game with this title already exists"
+                );
+            }
+
+            game.setTitle(newTitle);
+        }
+
         return toResponse(game);
     }
 
@@ -45,9 +64,7 @@ public class GameService {
     // DELETE
     // -----------------------------
     public void delete(Long id) {
-        Game game = gameRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Game not found"));
-
+        Game game = gameRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.GAME_NOT_FOUND, "Game not found"));
         gameRepository.delete(game);
     }
 
@@ -65,9 +82,7 @@ public class GameService {
     // GET BY ID
     // -----------------------------
     public GameResponse getById(Long id) {
-        Game game = gameRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Game not found"));
-
+        Game game = gameRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.GAME_NOT_FOUND, "Game not found"));
         return toResponse(game);
     }
 

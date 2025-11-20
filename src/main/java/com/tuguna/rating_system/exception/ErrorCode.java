@@ -10,5 +10,6 @@ public enum ErrorCode {
     ACCESS_DENIED,
     GAME_NOT_FOUND,
     GAME_OBJECT_NOT_FOUND,
-    USER_NOT_FOUND
+    USER_NOT_FOUND,
+    GAME_TITLE_EXISTS
 }

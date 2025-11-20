@@ -1,12 +1,12 @@
 package com.tuguna.rating_system.controller;
 
+import com.tuguna.rating_system.dto.ApiResponse;
 import com.tuguna.rating_system.dto.comment.CommentResponse;
 import com.tuguna.rating_system.dto.game.GameRequest;
 import com.tuguna.rating_system.dto.game.GameResponse;
-import com.tuguna.rating_system.model.entity.Game;
 import com.tuguna.rating_system.service.impl.CommentService;
 import com.tuguna.rating_system.service.impl.GameService;
-import lombok.NoArgsConstructor;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,29 +56,31 @@ public class AdminCommentController {
     }
 
     @PostMapping("/games")
-    public GameResponse createGame(@RequestBody GameRequest request) {
-        return gameService.create(request.getTitle());
+    public ApiResponse<GameResponse> create(@Valid @RequestBody GameRequest request) {
+        GameResponse response = gameService.create(request.getTitle());
+        return ApiResponse.success("Game created successfully", response);
     }
 
     @PutMapping("/games/{id}")
-    public GameResponse updateGame(@PathVariable Long id, @RequestBody GameRequest request) {
-        return gameService.update(id, request.getTitle());
+    public ApiResponse<GameResponse> update(@PathVariable Long id, @Valid @RequestBody GameRequest request) {
+        GameResponse updated = gameService.update(id, request.getTitle());
+        return ApiResponse.success("Game updated successfully", updated);
     }
 
     @DeleteMapping("/games/{id}")
-    public ResponseEntity<String> deleteGame(@PathVariable Long id) {
+    public ApiResponse<Void> delete(@PathVariable Long id) {
         gameService.delete(id);
-        return ResponseEntity.ok("Game deleted");
+        return ApiResponse.success("Game deleted successfully", null);
     }
 
     @GetMapping("/games")
-    public List<GameResponse> getAllGames() {
-        return gameService.getAll();
+    public ApiResponse<List<GameResponse>> getAll() {
+        return ApiResponse.success("Games fetched successfully", gameService.getAll());
     }
 
     @GetMapping("/games/{id}")
-    public GameResponse getGameById(@PathVariable Long id) {
-        return gameService.getById(id);
+    public ApiResponse<GameResponse> getById(@PathVariable Long id) {
+        return ApiResponse.success("Game fetched successfully", gameService.getById(id));
     }
 
 }
