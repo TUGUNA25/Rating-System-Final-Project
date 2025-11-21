@@ -2,7 +2,7 @@ package com.tuguna.rating_system.repository;
 
 import com.tuguna.rating_system.model.entity.Game;
 import com.tuguna.rating_system.model.entity.GameObject;
-import com.tuguna.rating_system.model.entity.User;
+import com.tuguna.rating_system.model.entity.User.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

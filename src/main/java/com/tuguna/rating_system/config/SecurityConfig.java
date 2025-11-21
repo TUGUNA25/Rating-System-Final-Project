@@ -52,9 +52,9 @@ public class SecurityConfig {
                         // AUTH + PUBLIC ENDPOINTS
                         // -------------------------
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/sellers/**").permitAll()
-
+                        // PUBLIC Users endpoints
+                        .requestMatchers(HttpMethod.GET, "/users", "/users/*").permitAll()
                         // PUBLIC comment endpoints
                         .requestMatchers(HttpMethod.GET, "/users/*/comments/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users/*/comments/**").permitAll()

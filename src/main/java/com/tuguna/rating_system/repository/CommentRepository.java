@@ -1,7 +1,7 @@
 package com.tuguna.rating_system.repository;
 
 import com.tuguna.rating_system.model.entity.Comment;
-import com.tuguna.rating_system.model.entity.User;
+import com.tuguna.rating_system.model.entity.User.User;
 import com.tuguna.rating_system.model.enums.CommentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

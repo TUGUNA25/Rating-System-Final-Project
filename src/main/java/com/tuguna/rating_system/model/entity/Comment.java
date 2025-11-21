@@ -1,6 +1,7 @@
 package com.tuguna.rating_system.model.entity;
 
 
+import com.tuguna.rating_system.model.entity.User.User;
 import com.tuguna.rating_system.model.enums.CommentStatus;
 import jakarta.persistence.*;
 import lombok.*;

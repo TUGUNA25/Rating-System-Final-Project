@@ -1,5 +1,7 @@
-package com.tuguna.rating_system.model.entity;
+package com.tuguna.rating_system.model.entity.User;
 
+import com.tuguna.rating_system.model.entity.Comment;
+import com.tuguna.rating_system.model.entity.GameObject;
 import com.tuguna.rating_system.model.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;

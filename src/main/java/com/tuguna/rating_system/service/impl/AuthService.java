@@ -5,7 +5,7 @@ import com.tuguna.rating_system.dto.auth.LoginRequest;
 import com.tuguna.rating_system.dto.auth.RegisterRequest;
 import com.tuguna.rating_system.exception.ApiException;
 import com.tuguna.rating_system.exception.ErrorCode;
-import com.tuguna.rating_system.model.entity.User;
+import com.tuguna.rating_system.model.entity.User.User;
 import com.tuguna.rating_system.model.enums.Role;
 import com.tuguna.rating_system.repository.UserRepository;
 import com.tuguna.rating_system.service.security.JwtService;

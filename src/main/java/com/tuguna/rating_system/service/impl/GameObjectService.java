@@ -7,7 +7,7 @@ import com.tuguna.rating_system.exception.ApiException;
 import com.tuguna.rating_system.exception.ErrorCode;
 import com.tuguna.rating_system.model.entity.Game;
 import com.tuguna.rating_system.model.entity.GameObject;
-import com.tuguna.rating_system.model.entity.User;
+import com.tuguna.rating_system.model.entity.User.User;
 import com.tuguna.rating_system.repository.GameObjectRepository;
 import com.tuguna.rating_system.repository.GameRepository;
 import com.tuguna.rating_system.repository.UserRepository;

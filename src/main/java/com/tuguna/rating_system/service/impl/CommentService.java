@@ -6,7 +6,7 @@ import com.tuguna.rating_system.dto.comment.CommentUpdate;
 import com.tuguna.rating_system.exception.ApiException;
 import com.tuguna.rating_system.exception.ErrorCode;
 import com.tuguna.rating_system.model.entity.Comment;
-import com.tuguna.rating_system.model.entity.User;
+import com.tuguna.rating_system.model.entity.User.User;
 import com.tuguna.rating_system.model.enums.CommentStatus;
 import com.tuguna.rating_system.repository.CommentRepository;
 import com.tuguna.rating_system.repository.UserRepository;

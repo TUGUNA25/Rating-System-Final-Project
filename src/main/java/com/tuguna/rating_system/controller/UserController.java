@@ -1,7 +1,10 @@
 package com.tuguna.rating_system.controller;
 
-import com.tuguna.rating_system.model.entity.User;
+import com.tuguna.rating_system.dto.ApiResponse;
+import com.tuguna.rating_system.dto.user.UserResponse;
+import com.tuguna.rating_system.model.entity.User.User;
 import com.tuguna.rating_system.service.impl.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,13 +20,21 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
-    }
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getUsers(
+            @RequestParam(required = false) Double minRating,
+            @RequestParam(required = false) Double maxRating,
+            @RequestParam(required = false) Integer minReviews,
+            @RequestParam(required = false) String gameTitle,
+            @RequestParam(required = false) String sort
 
+    ) {
+        List<UserResponse> result = userService.getFilteredUsers(minRating, maxRating, minReviews, sort,gameTitle);
+        return ResponseEntity.ok(ApiResponse.success("Users filtered", result));
+    }
     @GetMapping("/{id}")
-    public User getUser(@PathVariable Long id) {
-        return userService.getUserById(id);
+    public ResponseEntity<ApiResponse<UserResponse>> getUser(@PathVariable Long id) {
+        UserResponse response = userService.getUserById(id);
+        return ResponseEntity.ok(ApiResponse.success("User retrieved", response));
     }
 
     @PostMapping

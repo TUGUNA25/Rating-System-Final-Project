@@ -1,33 +1,62 @@
 package com.tuguna.rating_system.service.impl;
 
-import com.tuguna.rating_system.model.entity.Comment;
-import com.tuguna.rating_system.model.entity.User;
-import com.tuguna.rating_system.model.enums.CommentStatus;
+import com.tuguna.rating_system.dto.user.UserResponse;
+import com.tuguna.rating_system.exception.ApiException;
+import com.tuguna.rating_system.exception.ErrorCode;
+import com.tuguna.rating_system.model.entity.User.User;
+import com.tuguna.rating_system.model.entity.User.UserSpecification;
+import com.tuguna.rating_system.model.enums.Role;
 import com.tuguna.rating_system.repository.CommentRepository;
 import com.tuguna.rating_system.repository.UserRepository;
 import com.tuguna.rating_system.service.security.CustomUserDetails;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final ModelMapper mapper;
 
-    public UserService(UserRepository userRepository,CommentRepository commentRepository){
-        this.userRepository = userRepository;
-        this.commentRepository = commentRepository;
+    private static final Map<String, Sort> SORTING_MAP = Map.of(
+            "rating_asc", Sort.by("averageRating").ascending(),
+            "rating_desc", Sort.by("averageRating").descending(),
+            "createdat_asc", Sort.by("createdAt").ascending(),
+            "createdat_desc", Sort.by("createdAt").descending()
+    );
+
+
+    public List<UserResponse> getFilteredUsers(Double minRating, Double maxRating, Integer minReviews,String sort,String gameTitle) {
+        Specification<User> spec = Specification.allOf(
+                UserSpecification.isSeller(),
+                UserSpecification.isEmailVerified(),
+                UserSpecification.hasMinRating(minRating),
+                UserSpecification.hasMaxRating(maxRating),
+                UserSpecification.hasMinReviews(minReviews),
+                UserSpecification.hasGameTitle(gameTitle)
+        );
+        String key = (sort == null) ? "" : sort.toLowerCase();
+        Sort sorting = SORTING_MAP.getOrDefault(key, Sort.unsorted());
+
+        List<User> users = userRepository.findAll(spec, sorting);
+        return toResponseList(users);
     }
 
-    public List<User> getAllUsers(){
-        return userRepository.findAll();
-    }
-
-    public User getUserById(long id){
-        return userRepository.findById(id).orElse(null);
+    public UserResponse getUserById(long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND, "User not found with id: " + id));
+        if (user.getRole() != Role.SELLER || !user.getEmailVerified()) {
+            throw new ApiException(ErrorCode.ACCESS_DENIED, "Only verified sellers can be viewed");
+        }
+        return toResponse(user);
     }
 
     public User createUser(User user){
@@ -72,5 +101,24 @@ public class UserService {
             seller.setRatingsCount((int) count);
         }
 
+    }
+
+    private UserResponse toResponse(User user) {
+        UserResponse dto = mapper.map(user, UserResponse.class);
+        dto.setId(user.getId());
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        dto.setEmail(user.getEmail());
+
+        dto.setAverageRating(user.getAverageRating());
+        dto.setRatingsCount(user.getRatingsCount());
+
+        return dto;
+    }
+
+    private List<UserResponse> toResponseList(List<User> users) {
+        return users.stream()
+                .map(this::toResponse)
+                .toList();
     }
 }
