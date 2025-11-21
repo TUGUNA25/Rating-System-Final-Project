@@ -13,5 +13,6 @@ public enum ErrorCode {
     USER_NOT_FOUND,
     GAME_TITLE_EXISTS,
     INVALID_CODE,
-    BAD_REQUEST
+    BAD_REQUEST,
+    INVALID_ROLE
 }

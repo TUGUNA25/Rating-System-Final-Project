@@ -67,6 +67,40 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+    public List<UserResponse> adminGetAllUsers() {
+        List<User> users = userRepository.findAll();
+        return toResponseList(users);
+    }
+
+    public UserResponse adminGetUserById(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND, "User not found with id: " + id));
+        return toResponse(user);
+    }
+
+    @Transactional
+    public UserResponse adminVerifyUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND, "User not found with id: " + id));
+        user.setEmailVerified(true);
+        return toResponse(user);
+    }
+
+    @Transactional
+    public UserResponse adminChangeRole(Long id, String roleStr) {
+        roleStr = roleStr.trim().toUpperCase();
+        if (!roleStr.equals("ADMIN") && !roleStr.equals("SELLER")) {
+            throw new ApiException(ErrorCode.INVALID_ROLE, "Invalid role. Allowed values: SELLER, ADMIN UPPERCASE!!!");
+        }
+        Role newRole = Role.valueOf(roleStr);
+        User user = userRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND, "User not found with id: " + id));
+        user.setRole(newRole);
+        return toResponse(user);
+    }
+
+    public void adminDeleteUser(Long id) {
+        if (!userRepository.existsById(id)) {throw new ApiException(ErrorCode.USER_NOT_FOUND, "User not found with id: " + id);}
+        userRepository.deleteById(id);
+    }
+
     public CustomUserDetails getCurrentUser() {
         var auth = SecurityContextHolder.getContext().getAuthentication();
 
