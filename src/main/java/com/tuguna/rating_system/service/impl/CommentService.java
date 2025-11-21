@@ -2,6 +2,9 @@ package com.tuguna.rating_system.service.impl;
 
 import com.tuguna.rating_system.dto.comment.CommentCreate;
 import com.tuguna.rating_system.dto.comment.CommentResponse;
+import com.tuguna.rating_system.dto.comment.CommentUpdate;
+import com.tuguna.rating_system.exception.ApiException;
+import com.tuguna.rating_system.exception.ErrorCode;
 import com.tuguna.rating_system.model.entity.Comment;
 import com.tuguna.rating_system.model.entity.User;
 import com.tuguna.rating_system.model.enums.CommentStatus;
@@ -30,18 +33,15 @@ public class CommentService {
 
     public CommentResponse addComment(CommentCreate dto, Long sellerId) {
 
-        User seller = userRepository.findById(sellerId).orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
+        User seller = userRepository.findById(sellerId).orElseThrow(() -> new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Seller not found with id: " + sellerId));
 
-        // user from JWT
+        // current authenticated user (null if user is anonymous)
         CustomUserDetails currentUser = userService.getCurrentUser();
 
         User author = null;
         if (currentUser != null) {
-            Long userId = currentUser.getId();
-            author = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
+            author = userRepository.getReferenceById(currentUser.getId());
         }
-
         Comment comment = Comment.builder()
                 .content(dto.getContent())
                 .rating(dto.getRating())
@@ -56,71 +56,62 @@ public class CommentService {
 
     //comments that seller get from people
     public List<CommentResponse> getCommentsForSeller(Long sellerId) {
-        User seller = userRepository.findById(sellerId).orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
-
-        List<Comment> comments = commentRepository.findBySellerAndStatus(seller, CommentStatus.APPROVED);
-
+        if (!userRepository.existsById(sellerId)) {throw new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Seller not found with id: " + sellerId);
+        }
+        User sellerRef = userRepository.getReferenceById(sellerId);
+        List<Comment> comments = commentRepository.findBySellerAndStatus(sellerRef, CommentStatus.APPROVED);
         return mapToResponseList(comments);
     }
 
+
     //comments that seller writes for other sellers profile
-    // gadasaweria !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    public List<CommentResponse> getCommentsWrittenBySeller(Long sellerId) {
-        User author = userRepository.findById(sellerId).orElseThrow(() -> new RuntimeException("User not found with id: " + sellerId));
-
+    public List<CommentResponse> getCommentsWrittenBySeller() {
+        CustomUserDetails currentUser = userService.getCurrentUser();
+        Long userId = currentUser.getId();
+        User author = userRepository.getReferenceById(userId);
         List<Comment> comments = commentRepository.findByAuthorAndStatus(author, CommentStatus.APPROVED);
-
         return mapToResponseList(comments);
     }
 
     // get a specific comment
     public CommentResponse getSpecificComment(Long sellerId, Long commentId) {
-
-        User seller = userRepository.findById(sellerId).orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
-        Comment comment = commentRepository.findByIdAndSellerAndStatus(
-                        commentId,
-                        seller,
-                        CommentStatus.APPROVED
-                ).orElseThrow(() -> new RuntimeException("Approved comment not found"));
+        if (!userRepository.existsById(sellerId)) {throw new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Seller not found with id: " + sellerId);
+        }
+        User sellerRef = userRepository.getReferenceById(sellerId);
+        Comment comment = commentRepository.findByIdAndSellerAndStatus(commentId, sellerRef, CommentStatus.APPROVED).orElseThrow(() -> new ApiException(
+                ErrorCode.RESOURCE_NOT_FOUND,
+                "Approved comment not found"
+        ));
 
         return mapToResponseDTO(comment);
     }
 
     @Transactional
-    public CommentResponse updateComment(Long commentId, CommentCreate dto) {
+    public CommentResponse updateComment(Long commentId, CommentUpdate dto) {
 
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+                .orElseThrow(() -> new ApiException(
+                        ErrorCode.RESOURCE_NOT_FOUND,
+                        "Comment not found"
+                ));
 
-        // Update fields
         if (dto.getContent() != null) {
             comment.setContent(dto.getContent());
         }
 
-        if (dto.getRating() != 0) {
+        if (dto.getRating() != 0) { // 0 means "not provided"
             comment.setRating(dto.getRating());
-            userService.updateSellerRating(comment.getSeller());
         }
+
+        // After editing comment must be reapproved by admin
+        comment.setStatus(CommentStatus.PENDING);
 
         return mapToResponseDTO(comment);
     }
 
     @Transactional
     public void deleteComment(Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
-
-        CustomUserDetails userDetails = userService.getCurrentUser();
-
-        if (userDetails == null) {
-            throw new RuntimeException("You must be logged in to delete comments");
-        }
-
-        Long userId = userDetails.getId();
-
-        if (comment.getAuthor() == null || !comment.getAuthor().getId().equals(userId)) {
-            throw new RuntimeException("You are not allowed to delete this comment");
-        }
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Comment not found"));
         User seller = comment.getSeller();
         commentRepository.delete(comment);
         userService.updateSellerRating(seller);
@@ -128,8 +119,8 @@ public class CommentService {
 
     @Transactional
     public void adminDeleteComment(Long commentId) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("Comment not found"));
-        User seller = comment.getSeller(); // store before delete
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Comment not found"));
+        User seller = comment.getSeller();
         commentRepository.delete(comment);
         userService.updateSellerRating(seller);
     }
@@ -140,27 +131,20 @@ public class CommentService {
 
     @Transactional
     public CommentResponse approveComment(Long commentId) {
-
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("Comment not found"));
-
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Comment not found with id: " + commentId));
         comment.setStatus(CommentStatus.APPROVED);
-
         userService.updateSellerRating(comment.getSeller());
-
         return mapToResponseDTO(comment);
     }
 
     @Transactional
     public void rejectPendingComment(Long commentId) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("Comment not found"));
-
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Comment not found with id: " + commentId));
         if (comment.getStatus() != CommentStatus.PENDING) {
-            throw new RuntimeException("Only pending comments can be rejected");
+            throw new ApiException(ErrorCode.BAD_REQUEST, "Only pending comments can be rejected");
         }
-
         commentRepository.delete(comment);
     }
-
 
 
     // mapping helpers

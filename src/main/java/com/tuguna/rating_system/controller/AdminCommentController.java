@@ -25,34 +25,35 @@ public class AdminCommentController {
      * Get all pending comment
      */
     @GetMapping("/comments/pending")
-    public List<CommentResponse> getPendingComments() {
-        return commentService.getPendingComments();
+    public ResponseEntity<ApiResponse<List<CommentResponse>>> getPendingComments() {
+        List<CommentResponse> list = commentService.getPendingComments();
+        return ResponseEntity.ok(ApiResponse.success("Pending comments retrieved", list));
     }
 
     /**
      * Approve a pending comment
      */
     @PutMapping("/comments/{commentId}/approve")
-    public CommentResponse approveComment(@PathVariable Long commentId) {
-        return commentService.approveComment(commentId);
+    public ResponseEntity<ApiResponse<CommentResponse>> approveComment(@PathVariable Long commentId) {
+        CommentResponse response = commentService.approveComment(commentId);
+        return ResponseEntity.ok(ApiResponse.success("Comment approved", response));
     }
 
     /**
      * Delete any comment
      */
     @DeleteMapping("/comments/{commentId}")
-    public ResponseEntity<String> adminDeleteComment(@PathVariable Long commentId) {
+    public ResponseEntity<ApiResponse<String>> adminDeleteComment(@PathVariable Long commentId) {
         commentService.adminDeleteComment(commentId);
-        return ResponseEntity.ok("Comment deleted by admin");
+        return ResponseEntity.ok(ApiResponse.success("Comment deleted by admin", null));
     }
 
     /**
      * Reject a pending comment (delete it)
      */
-    @DeleteMapping("/comments/{commentId}/reject")
-    public ResponseEntity<String> rejectComment(@PathVariable Long commentId) {
+    public ResponseEntity<ApiResponse<String>> rejectComment(@PathVariable Long commentId) {
         commentService.rejectPendingComment(commentId);
-        return ResponseEntity.ok("Comment rejected and deleted");
+        return ResponseEntity.ok(ApiResponse.success("Comment rejected and deleted", null));
     }
 
     @PostMapping("/games")

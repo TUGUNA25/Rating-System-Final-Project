@@ -12,5 +12,6 @@ public enum ErrorCode {
     GAME_OBJECT_NOT_FOUND,
     USER_NOT_FOUND,
     GAME_TITLE_EXISTS,
-    INVALID_CODE
+    INVALID_CODE,
+    BAD_REQUEST
 }

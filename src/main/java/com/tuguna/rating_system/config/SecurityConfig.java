@@ -60,7 +60,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/users/*/comments/**").permitAll()
 
                         // Seller-only endpoint for written comments
-                        .requestMatchers(HttpMethod.GET, "/users/*/comments/written").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/users/*/comments/my").authenticated()
 
                         // Author-only delete/update (checked by @PreAuthorize)
                         .requestMatchers(HttpMethod.PUT, "/users/*/comments/*").authenticated()
