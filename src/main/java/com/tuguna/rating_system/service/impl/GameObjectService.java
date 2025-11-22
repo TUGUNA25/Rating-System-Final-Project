@@ -34,8 +34,6 @@ public class GameObjectService {
         User seller = userRepository.findById(sellerId).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND, "User not found"));
         Game game = gameRepository.findById(request.getGameId()).orElseThrow(() -> new ApiException(ErrorCode.GAME_NOT_FOUND, "Game not found with id: " + request.getGameId()));
 
-        User sellerRef = User.builder().id(sellerId).build();
-
         GameObject object = GameObject.builder()
                 .name(request.getName())
                 .price(request.getPrice())
@@ -73,15 +71,24 @@ public class GameObjectService {
         gameObjectRepository.delete(object);
     }
 
-    public List<GameObjectResponse> getAll() {
-        List<GameObject> objects = gameObjectRepository.findAll();
-        return toResponseList(objects);
-    }
 
     public List<GameObjectResponse> getMyObjects() {
         Long sellerId = userService.getCurrentUser().getId();
         List<GameObject> objects = gameObjectRepository.findBySellerId(sellerId);
         return toResponseList(objects);
+    }
+
+    public List<GameObjectResponse> getall(String gameTitle, Long sellerId) {
+        boolean hasTitle = gameTitle != null && !gameTitle.trim().isEmpty();
+        boolean hasSeller = sellerId != null;
+        if (hasTitle && hasSeller) {
+            return toResponseList(gameObjectRepository.findBySellerIdAndGame_TitleIgnoreCaseContaining(sellerId, gameTitle));
+        }
+        if (hasSeller) {return toResponseList(gameObjectRepository.findBySellerId(sellerId));
+        }
+        if (hasTitle) {return toResponseList(gameObjectRepository.findByGame_TitleIgnoreCaseContaining(gameTitle));
+        }
+        return toResponseList(gameObjectRepository.findAll());
     }
 
     public GameObjectResponse getById(Long id) {

@@ -5,7 +5,6 @@ import com.tuguna.rating_system.dto.gameobject.GameObjectCreateRequest;
 import com.tuguna.rating_system.dto.gameobject.GameObjectResponse;
 import com.tuguna.rating_system.dto.gameobject.GameObjectUpdateRequest;
 import com.tuguna.rating_system.service.impl.GameObjectService;
-import com.tuguna.rating_system.service.impl.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,7 +18,6 @@ import java.util.List;
 public class GameObjectController {
 
     private final GameObjectService gameObjectService;
-    private final UserService userService;
 
     // ----------------------------------------------------
     // CREATE
@@ -36,8 +34,9 @@ public class GameObjectController {
     // GET /object
     // ----------------------------------------------------
     @GetMapping
-    public ApiResponse<List<GameObjectResponse>> getAll() {
-        return ApiResponse.success("All objects fetched successfully", gameObjectService.getAll());
+    public ApiResponse<List<GameObjectResponse>> search(@RequestParam(required = false) String gametitle, @RequestParam(required = false) Long sellerId) {
+        return ApiResponse.success("Objects fetched successfully", gameObjectService.getall(gametitle, sellerId)
+        );
     }
 
     // ----------------------------------------------------

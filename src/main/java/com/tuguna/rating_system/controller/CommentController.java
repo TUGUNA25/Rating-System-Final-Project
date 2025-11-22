@@ -39,8 +39,7 @@ public class CommentController {
     //  /users/{sellerId}/comments/my
     @GetMapping("/my")
     @PreAuthorize("#sellerId == authentication.principal.id and hasRole('SELLER')")
-    public ResponseEntity<ApiResponse<List<CommentResponse>>> getMyWrittenComments() {
-
+    public ResponseEntity<ApiResponse<List<CommentResponse>>> getMyWrittenComments(@PathVariable Long sellerId) {
         List<CommentResponse> list = commentService.getCommentsWrittenBySeller();
         return ResponseEntity.ok(ApiResponse.success("Your written comments", list));
     }
