@@ -37,12 +37,12 @@ public class Comment {
     private CommentStatus status = CommentStatus.PENDING;
 
     // The seller who receives this comment
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
     private User seller;
 
     // The user (seller or anonymous) who wrote it
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     private User author;
 

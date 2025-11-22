@@ -120,10 +120,8 @@ public class UserService {
 
         return null;
     }
-
     @Transactional
     public void updateSellerRating(User seller) {
-
         long count = commentRepository.countApproved(seller.getId());
         Double avg = commentRepository.averageApproved(seller.getId());
 
@@ -134,20 +132,10 @@ public class UserService {
             seller.setAverageRating(avg);
             seller.setRatingsCount((int) count);
         }
-
     }
 
     private UserResponse toResponse(User user) {
-        UserResponse dto = mapper.map(user, UserResponse.class);
-        dto.setId(user.getId());
-        dto.setFirstName(user.getFirstName());
-        dto.setLastName(user.getLastName());
-        dto.setEmail(user.getEmail());
-
-        dto.setAverageRating(user.getAverageRating());
-        dto.setRatingsCount(user.getRatingsCount());
-
-        return dto;
+        return mapper.map(user, UserResponse.class);
     }
 
     private List<UserResponse> toResponseList(List<User> users) {

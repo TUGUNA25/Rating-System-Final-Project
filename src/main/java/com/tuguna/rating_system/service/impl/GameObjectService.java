@@ -48,9 +48,6 @@ public class GameObjectService {
         return toResponse(object);
     }
 
-    // -----------------------------
-    // UPDATE
-    // -----------------------------
     @Transactional
     public GameObjectResponse update(Long id, GameObjectUpdateRequest request) {
         GameObject object = gameObjectRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.GAME_OBJECT_NOT_FOUND, "Game object not found"));
@@ -70,18 +67,12 @@ public class GameObjectService {
         return toResponse(object);
     }
 
-    // -----------------------------
-    // DELETE
-    // -----------------------------
     @Transactional
     public void delete(Long id) {
         GameObject object = gameObjectRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.GAME_OBJECT_NOT_FOUND, "Game object not found"));
         gameObjectRepository.delete(object);
     }
 
-    // -----------------------------
-    // GET ALL OBJECTS
-    // -----------------------------
     public List<GameObjectResponse> getAll() {
         List<GameObject> objects = gameObjectRepository.findAll();
         return toResponseList(objects);
@@ -98,9 +89,6 @@ public class GameObjectService {
         return toResponse(object);
     }
 
-    // -----------------------------
-    // MAPPER
-    // -----------------------------
     private GameObjectResponse toResponse(GameObject object) {
         GameObjectResponse dto = mapper.map(object, GameObjectResponse.class);
 

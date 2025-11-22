@@ -147,7 +147,6 @@ public class CommentService {
     }
 
 
-    // mapping helpers
     private CommentResponse mapToResponseDTO(Comment comment) {
         CommentResponse dto = mapper.map(comment, CommentResponse.class);
         dto.setSellerId(comment.getSeller().getId());
