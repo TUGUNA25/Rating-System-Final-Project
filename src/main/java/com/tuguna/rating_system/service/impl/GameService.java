@@ -19,9 +19,7 @@ public class GameService {
     private final GameRepository gameRepository;
     private final ModelMapper mapper;
 
-    // -----------------------------
-    // CREATE
-    // -----------------------------
+
     public GameResponse create(String title) {
         if (gameRepository.existsByTitleIgnoreCase(title)) {throw new ApiException(ErrorCode.GAME_TITLE_EXISTS, "Game with this title already exists");
         }
@@ -33,9 +31,6 @@ public class GameService {
         return toResponse(game);
     }
 
-    // -----------------------------
-    // UPDATE
-    // -----------------------------
     @Transactional
     public GameResponse update(Long id, String newTitle) {
 
@@ -60,17 +55,13 @@ public class GameService {
         return toResponse(game);
     }
 
-    // -----------------------------
-    // DELETE
-    // -----------------------------
+
     public void delete(Long id) {
         Game game = gameRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.GAME_NOT_FOUND, "Game not found"));
         gameRepository.delete(game);
     }
 
-    // -----------------------------
-    // GET ALL
-    // -----------------------------
+
     public List<GameResponse> getAll() {
         return gameRepository.findAll()
                 .stream()
@@ -78,17 +69,13 @@ public class GameService {
                 .toList();
     }
 
-    // -----------------------------
-    // GET BY ID
-    // -----------------------------
+
     public GameResponse getById(Long id) {
         Game game = gameRepository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.GAME_NOT_FOUND, "Game not found"));
         return toResponse(game);
     }
 
-    // -----------------------------
-    // DTO MAPPER
-    // -----------------------------
+
     private GameResponse toResponse(Game game) {
         return mapper.map(game, GameResponse.class);
     }
