@@ -32,9 +32,9 @@ public class GameObjectController {
      * Get all objects (public)
      */
     @GetMapping
-    public ApiResponse<List<GameObjectResponse>> search(@RequestParam(required = false) String gametitle, @RequestParam(required = false) Long sellerId) {
-        return ApiResponse.success("Objects fetched successfully", gameObjectService.getall(gametitle, sellerId)
-        );
+    public ApiResponse<List<GameObjectResponse>> search(@RequestParam(required = false) String gametitle,
+            @RequestParam(required = false) Long sellerId) {
+        return ApiResponse.success("Objects fetched successfully", gameObjectService.getall(gametitle, sellerId));
     }
 
     /**
@@ -59,7 +59,8 @@ public class GameObjectController {
      */
     @PutMapping("/{id}")
     @PreAuthorize("@gameObjectPermission.canEdit(#id, authentication.principal.id)")
-    public ApiResponse<GameObjectResponse> update(@PathVariable Long id, @Valid @RequestBody GameObjectUpdateRequest request) {
+    public ApiResponse<GameObjectResponse> update(@PathVariable Long id,
+            @Valid @RequestBody GameObjectUpdateRequest request) {
         GameObjectResponse updated = gameObjectService.update(id, request);
         return ApiResponse.success("Object updated successfully", updated);
     }

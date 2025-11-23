@@ -34,7 +34,7 @@ public class SecurityConfig {
                 // 2) Disable CORS
                 .cors(cors -> cors.disable())
 
-                // 3)Spring Security 6 blocks POST requests unless this is disabled
+                // 3) Disable request cache
                 .requestCache(cache -> cache.disable())
 
                 // 4) Disable form login / logout to avoid interfering with POST requests
