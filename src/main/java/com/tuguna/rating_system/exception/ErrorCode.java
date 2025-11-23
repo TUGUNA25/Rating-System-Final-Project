@@ -1,0 +1,18 @@
+package com.tuguna.rating_system.exception;
+
+
+public enum ErrorCode {
+    EMAIL_ALREADY_EXISTS,
+    INVALID_CREDENTIALS,
+    EMAIL_NOT_VERIFIED,
+    RESOURCE_NOT_FOUND,
+    VALIDATION_ERROR,
+    ACCESS_DENIED,
+    GAME_NOT_FOUND,
+    GAME_OBJECT_NOT_FOUND,
+    USER_NOT_FOUND,
+    GAME_TITLE_EXISTS,
+    INVALID_CODE,
+    BAD_REQUEST,
+    INVALID_ROLE
+}
