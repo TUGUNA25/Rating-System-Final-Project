@@ -99,12 +99,14 @@ public class CommentService {
             comment.setContent(dto.getContent());
         }
 
-        if (dto.getRating() != 0) { // 0 means "not provided"
+        if (dto.getRating() != null) {
             comment.setRating(dto.getRating());
         }
 
         // After editing comment must be reapproved by admin
         comment.setStatus(CommentStatus.PENDING);
+
+        userService.updateSellerRating(comment.getSeller());
 
         return mapToResponseDTO(comment);
     }
