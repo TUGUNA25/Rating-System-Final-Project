@@ -55,6 +55,7 @@ public class AdminController {
     /**
      * Reject a pending comment (delete it)
      */
+    @DeleteMapping("/comments/{commentId}/reject")
     public ResponseEntity<ApiResponse<String>> rejectComment(@PathVariable Long commentId) {
         commentService.rejectPendingComment(commentId);
         return ResponseEntity.ok(ApiResponse.success("Comment rejected and deleted", null));
@@ -79,15 +80,6 @@ public class AdminController {
     }
 
 
-    @GetMapping("/games")
-    public ApiResponse<List<GameResponse>> getAll() {
-        return ApiResponse.success("Games fetched successfully", gameService.getAll());
-    }
-
-    @GetMapping("/games/{id}")
-    public ApiResponse<GameResponse> getById(@PathVariable Long id) {
-        return ApiResponse.success("Game fetched successfully", gameService.getById(id));
-    }
 
     // Get ALL users (admins included)
     @GetMapping("/users")

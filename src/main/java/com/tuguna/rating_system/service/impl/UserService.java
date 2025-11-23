@@ -129,7 +129,8 @@ public class UserService {
             seller.setAverageRating(0.0);
             seller.setRatingsCount(0);
         } else {
-            seller.setAverageRating(avg);
+            double rounded = Math.round(avg * 100.0) / 100.0;
+            seller.setAverageRating(rounded);
             seller.setRatingsCount((int) count);
         }
     }

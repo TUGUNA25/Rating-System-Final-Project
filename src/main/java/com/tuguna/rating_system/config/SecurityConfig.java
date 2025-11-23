@@ -53,6 +53,7 @@ public class SecurityConfig {
                         // -------------------------
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/sellers/**").permitAll()
+                        .requestMatchers("/games/**").permitAll()
                         // PUBLIC Users endpoints
                         .requestMatchers(HttpMethod.GET, "/users", "/users/*").permitAll()
                         // PUBLIC comment endpoints
