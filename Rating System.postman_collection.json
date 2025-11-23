@@ -1,0 +1,1094 @@
+{
+	"info": {
+		"_postman_id": "8a1332e7-d1a2-4a6f-8485-f7917b5bd5a8",
+		"name": "Rating System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41792164"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get all users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "minRating",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "maxRating",
+									"value": "5",
+									"disabled": true
+								},
+								{
+									"key": "minReviews",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "gameTitle",
+									"value": "valorant",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "rating_desc",
+									"description": "rating_desc/rating_asc\n",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "createdat_desc",
+									"description": "createdat_asc/createdat_desc",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/5",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"5"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Comments",
+			"item": [
+				{
+					"name": "Add comment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIxMyIsImlhdCI6MTc2MzkxODk5OCwiZXhwIjoxNzYzOTIyNTk4fQ.IWV0Cz-z1Xuo9l8D9Ai2h9tRv9bfz2vkwHFg3uU-TpiOCn5KNPDCV7DiX6eyPAdi",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"content\": \"not bad\",\n  \"rating\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/6/comments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"6",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get comments for seller",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/6/comments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"6",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get written comments(seller)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIzIiwiaWF0IjoxNzYzODU1NDc1LCJleHAiOjE3NjM4NTkwNzV9._HfhD-ZFs4lyT-ifBXWy6Eyf3w_xyS11gd5DK2S-H-79c6BNHxDpi7rhdu6Ja_ZD",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/3/comments/my",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"3",
+								"comments",
+								"my"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get specific comment",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/6/comments/9",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"6",
+								"comments",
+								"9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Comment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIxMyIsImlhdCI6MTc2MzkyMjA0MSwiZXhwIjoxNzYzOTI1NjQxfQ.2ewgnkxFykE0fV5HKBEITlp11Zla0DsmfiRSJygvu4v2diftGa55hclhdY527u9S",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"rating\":3\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users/6/comments/13",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"6",
+								"comments",
+								"13"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Comment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIxMiIsImlhdCI6MTc2MzczMzkwOCwiZXhwIjoxNzYzNzM3NTA4fQ.XTyXJf3jJDemebpBZA7oZlK7fWik26UtcEGOLUdwYx3S8tAFa4JJn84CVvz24n2n",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/6/comments/8",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"6",
+								"comments",
+								"8"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Comments",
+					"item": [
+						{
+							"name": "Get pending comments",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI5IiwiaWF0IjoxNzYzOTE5MzAwLCJleHAiOjE3NjM5MjI5MDB9.MpGUpkfZW2lSiCW6SP738FUUP2w_yBgUGZ5bx0QWGCP2Ws3xxgGHaCoT3IYxsluP",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/admin/comments/pending",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"comments",
+										"pending"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Approve comment",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI5IiwiaWF0IjoxNzYzOTIyMTI4LCJleHAiOjE3NjM5MjU3Mjh9.cMCYf3lyEF7i60A3u1iSLRs6J4rjDAfRgdA6nI2a3Okxqiaq-yaXP8z5R5WTW5Dr",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/admin/comments/13/approve",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"comments",
+										"13",
+										"approve"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Reject comment",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI5IiwiaWF0IjoxNzYzOTE5NTc3LCJleHAiOjE3NjM5MjMxNzd9.3CUPwAsz9cDwg9Xq24oUsRoCZkrAl0BCx-ZwTb4O9h7UGlTwWdT_kdJq3NWG8wjF",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/admin/comments/12/reject",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"comments",
+										"12",
+										"reject"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin delete comment",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI0IiwiaWF0IjoxNzYzMzg4Mzg5LCJleHAiOjE3NjMzOTE5ODl9.GZFxXiXiaUH-OnxZwLFK7hdhwmuHlmE58awAruQmm9EaSYVj8jdB7T3TG8kCoZBq",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/admin/comments/2",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"comments",
+										"2"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Games",
+					"item": [
+						{
+							"name": "UpdateGame",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI5IiwiaWF0IjoxNzYzNjc3OTU5LCJleHAiOjE3NjM2ODE1NTl9.p-DaExdIK6ZRP_2vPfhJmTR36F0p6cXwxmjD9qMVFV_iNjrtMfigWTY6b4bY1XMB",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\":\"CS\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/games/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"games",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "AddGame",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI5IiwiaWF0IjoxNzYzNjc3OTU5LCJleHAiOjE3NjM2ODE1NTl9.p-DaExdIK6ZRP_2vPfhJmTR36F0p6cXwxmjD9qMVFV_iNjrtMfigWTY6b4bY1XMB",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"title\":\"Assasin Creed\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/games",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"games"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "DeleteGame",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "zd",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/admin/games/8",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"games",
+										"8"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Users",
+					"item": [
+						{
+							"name": "Get All User",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI5IiwiaWF0IjoxNzYzOTIwMDcxLCJleHAiOjE3NjM5MjM2NzF9.l-mPKyUwTkXOJ7LRDSBHVNZQHYvQe_f8JPykAHStT6XhOUPcdxGeFGcIKNbGRBxZ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/admin/users",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"admin",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete User",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI5IiwiaWF0IjoxNzYzNzU4ODMwLCJleHAiOjE3NjM3NjI0MzB9.a3MXUyG6meetY9Kc2Y6qU1zF6HSAXRbCJun35-FFy3ZQnZxQbKagscDmPE3JU21X",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/admin/users/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"admin",
+										"users",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change User Role",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI5IiwiaWF0IjoxNzYzOTIwMDcxLCJleHAiOjE3NjM5MjM2NzF9.l-mPKyUwTkXOJ7LRDSBHVNZQHYvQe_f8JPykAHStT6XhOUPcdxGeFGcIKNbGRBxZ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"role\": \"SELLER\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/admin/users/13/role",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"admin",
+										"users",
+										"13",
+										"role"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get One User",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI5IiwiaWF0IjoxNzYzOTIwMDcxLCJleHAiOjE3NjM5MjM2NzF9.l-mPKyUwTkXOJ7LRDSBHVNZQHYvQe_f8JPykAHStT6XhOUPcdxGeFGcIKNbGRBxZ",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/admin/users/13",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"admin",
+										"users",
+										"13"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Verify User Manually",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI5IiwiaWF0IjoxNzYzODU0Mjg5LCJleHAiOjE3NjM4NTc4ODl9.xicT8a45pifdQOg3JtdB37NKA5H-lFcXKZ-kWY1rHhLFuZTC8hq9zfA5Fhrf8Ft7",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/admin/users/3/verify",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"admin",
+										"users",
+										"3",
+										"verify"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "GameObject",
+			"item": [
+				{
+					"name": "Seller",
+					"item": [
+						{
+							"name": "Add Game Object",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIxMyIsImlhdCI6MTc2MzkyMDE3MywiZXhwIjoxNzYzOTIzNzczfQ.5YKzaIQ5LWuKUhzq3a_Vsbg8pyw42wrspikNw4Y2aWaU-6hFoXQCYvx-7Xl0nWaB",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"name\": \"Lebron Card\",\r\n  \"price\": 200,\r\n  \"gameId\": 3\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/object",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"object"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update GameObject",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIxMyIsImlhdCI6MTc2MzkyMDE3MywiZXhwIjoxNzYzOTIzNzczfQ.5YKzaIQ5LWuKUhzq3a_Vsbg8pyw42wrspikNw4Y2aWaU-6hFoXQCYvx-7Xl0nWaB",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{   \r\n  \"price\": 210\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/object/9",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"object",
+										"9"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete GameObject",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI5IiwiaWF0IjoxNzYzNTY5Mjk2LCJleHAiOjE3NjM1NzI4OTZ9.JQgF3wyZtVRCKuMWhNe4vk3kBRWh7vDw13pwifz33AcA49kqH4k2eiA-yASwtSqm",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/object/5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"object",
+										"5"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get My Game Objects",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIxMyIsImlhdCI6MTc2MzkyMDE3MywiZXhwIjoxNzYzOTIzNzczfQ.5YKzaIQ5LWuKUhzq3a_Vsbg8pyw42wrspikNw4Y2aWaU-6hFoXQCYvx-7Xl0nWaB",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/object/my",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"object",
+										"my"
+									]
+								},
+								"description": "GET /object — Get All Game Objects Returns a list of all game objects available in the system. Public endpoint (no authentication required)\n\nGET /object/{id} — Get a Single Game Object Retrieves detailed information about a specific game object by its ID. Public endpoint (no authentication required)\n\nGET /object/my — Get My Game Objects Returns all game objects created by the currently authenticated seller. !!!!! (Requires JWT authentication and seller role)"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Public",
+					"item": [
+						{
+							"name": "Get All Game Object",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/object?gametitle=2k",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"object"
+									],
+									"query": [
+										{
+											"key": "gametitle",
+											"value": "2k"
+										},
+										{
+											"key": "sellerId",
+											"value": "12",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Specific Game Object",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/object/2",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"object",
+										"2"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"giorgadzetuguna@gmail.com\",\r\n  \"password\": \"Password123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"firstName\": \"rati\",\r\n  \"lastName\": \"chixladze\",\r\n  \"email\": \"rati@gmail.com\",\r\n  \"password\": \"password123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ForgotPassword",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"giorgadzetuguna@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/forgot_password",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"forgot_password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Confirm Email",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/auth/confirm?code=2550acc2-2788-42f1-ab70-76849b028192",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"confirm"
+							],
+							"query": [
+								{
+									"key": "code",
+									"value": "2550acc2-2788-42f1-ab70-76849b028192"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PasswordReset",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"code\": \"827124\",\r\n  \"newPassword\": \"Password123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/reset",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"reset"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Games",
+			"item": [
+				{
+					"name": "GetAllGame",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/games",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"games"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetOneGame",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/games/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"games",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080"
+		}
+	]
+}
