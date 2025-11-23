@@ -61,18 +61,27 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success("Comment rejected and deleted", null));
     }
 
+    /**
+     * Create a new game
+     */
     @PostMapping("/games")
     public ApiResponse<GameResponse> create(@Valid @RequestBody GameRequest request) {
         GameResponse response = gameService.create(request.getTitle());
         return ApiResponse.success("Game created successfully", response);
     }
 
+    /**
+     * Update a game
+     */
     @PutMapping("/games/{id}")
     public ApiResponse<GameResponse> update(@PathVariable Long id, @Valid @RequestBody GameRequest request) {
         GameResponse updated = gameService.update(id, request.getTitle());
         return ApiResponse.success("Game updated successfully", updated);
     }
 
+    /**
+     * Delete a game
+     */
     @DeleteMapping("/games/{id}")
     public ApiResponse<Void> delete(@PathVariable Long id) {
         gameService.delete(id);
@@ -81,35 +90,45 @@ public class AdminController {
 
 
 
-    // Get ALL users (admins included)
+    /**
+     * Get all users (admins included)
+     */
     @GetMapping("/users")
     public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
         List<UserResponse> list = userService.adminGetAllUsers();
         return ResponseEntity.ok(ApiResponse.success("All users retrieved", list));
     }
 
-    // Get ANY user
+    /**
+     * Get any user by ID
+     */
     @GetMapping("users/{id}")
     public ResponseEntity<ApiResponse<UserResponse>> getUser(@PathVariable Long id) {
         UserResponse response = userService.adminGetUserById(id);
         return ResponseEntity.ok(ApiResponse.success("User retrieved", response));
     }
 
-    // Verify manually
+    /**
+     * Verify a user manually
+     */
     @PutMapping("users/{id}/verify")
     public ResponseEntity<ApiResponse<UserResponse>> verify(@PathVariable Long id) {
         UserResponse updated = userService.adminVerifyUser(id);
         return ResponseEntity.ok(ApiResponse.success("User verified", updated));
     }
 
-    // Change role
+    /**
+     * Change user role
+     */
     @PutMapping("/users/{id}/role")
     public ResponseEntity<ApiResponse<UserResponse>> changeRole(@PathVariable Long id, @Valid @RequestBody ChangeRoleRequest request) {
         UserResponse updated = userService.adminChangeRole(id, request.getRole());
         return ResponseEntity.ok(ApiResponse.success("Role updated successfully", updated));
     }
 
-    // Delete any user
+    /**
+     * Delete any user
+     */
     @DeleteMapping("users/{id}")
     public ResponseEntity<ApiResponse<String>> userdelete(@PathVariable Long id) {
         userService.adminDeleteUser(id);

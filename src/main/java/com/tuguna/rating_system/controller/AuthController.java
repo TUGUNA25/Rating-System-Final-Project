@@ -35,18 +35,27 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success("Login successful!", auth));
     }
 
+    /**
+     * Reset password
+     */
     @PostMapping("/reset")
     public ResponseEntity<ApiResponse<String>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         String message = authService.resetPassword(request.getCode(), request.getNewPassword());
         return ResponseEntity.ok(ApiResponse.success(message, null));
     }
 
+    /**
+     * Forgot password
+     */
     @PostMapping("/forgot_password")
     public ResponseEntity<ApiResponse<String>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         String message = authService.forgotPassword(request.getEmail());
         return ResponseEntity.ok(ApiResponse.success(message, null));
     }
 
+    /**
+     * Confirm email
+     */
     @GetMapping("/confirm")
     public ResponseEntity<ApiResponse<String>> confirmEmail(@RequestParam String code) {
         String message = verificationCodeService.confirmEmail(code);

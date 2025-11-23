@@ -19,6 +19,9 @@ public class UserController {
         this.userService = userService;
     }
 
+    /**
+     * Get filtered users
+     */
     @GetMapping
     public ResponseEntity<ApiResponse<List<UserResponse>>> getUsers(
             @RequestParam(required = false) Double minRating,
@@ -31,17 +34,27 @@ public class UserController {
         List<UserResponse> result = userService.getFilteredUsers(minRating, maxRating, minReviews, sort,gameTitle);
         return ResponseEntity.ok(ApiResponse.success("Users filtered", result));
     }
+
+    /**
+     * Get user by ID
+     */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserResponse>> getUser(@PathVariable Long id) {
         UserResponse response = userService.getUserById(id);
         return ResponseEntity.ok(ApiResponse.success("User retrieved", response));
     }
 
+    /**
+     * Create a new user
+     */
     @PostMapping
     public User createUser(@RequestBody User user) {
         return userService.createUser(user);
     }
 
+    /**
+     * Delete user
+     */
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);

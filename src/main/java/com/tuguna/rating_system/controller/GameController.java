@@ -16,11 +16,17 @@ import java.util.List;
 public class GameController {
     private final GameService gameService;
 
+    /**
+     * Get all games
+     */
     @GetMapping
     public ApiResponse<List<GameResponse>> getAll() {
         return ApiResponse.success("Games fetched successfully", gameService.getAll());
     }
 
+    /**
+     * Get game by ID
+     */
     @GetMapping("/{id}")
     public ApiResponse<GameResponse> getById(@PathVariable Long id) {
         return ApiResponse.success("Game fetched successfully", gameService.getById(id));

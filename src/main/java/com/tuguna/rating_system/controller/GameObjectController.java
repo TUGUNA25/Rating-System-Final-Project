@@ -19,49 +19,44 @@ public class GameObjectController {
 
     private final GameObjectService gameObjectService;
 
-    // ----------------------------------------------------
-    // CREATE
-    // POST /object
-    // ----------------------------------------------------
+    /**
+     * Create a new game object
+     */
     @PostMapping
     public ApiResponse<GameObjectResponse> create(@Valid @RequestBody GameObjectCreateRequest request) {
         GameObjectResponse response = gameObjectService.create(request);
         return ApiResponse.success("Object created successfully", response);
     }
 
-    // ----------------------------------------------------
-    // GET ALL OBJECTS (PUBLIC)
-    // GET /object
-    // ----------------------------------------------------
+    /**
+     * Get all objects (public)
+     */
     @GetMapping
     public ApiResponse<List<GameObjectResponse>> search(@RequestParam(required = false) String gametitle, @RequestParam(required = false) Long sellerId) {
         return ApiResponse.success("Objects fetched successfully", gameObjectService.getall(gametitle, sellerId)
         );
     }
 
-    // ----------------------------------------------------
-    // GET MY OBJECTS (AUTH REQUIRED)
-    // GET /object/my
-    // ----------------------------------------------------
+    /**
+     * Get my objects (auth required)
+     */
     @GetMapping("/my")
     public ApiResponse<List<GameObjectResponse>> getMyObjects() {
         return ApiResponse.success("Your objects fetched successfully", gameObjectService.getMyObjects());
     }
 
-    // ----------------------------------------------------
-    // GET BY ID (PUBLIC)
-    // GET /object/{id}
-    // ----------------------------------------------------
+    /**
+     * Get object by ID (public)
+     */
     @GetMapping("/{id}")
     public ApiResponse<GameObjectResponse> getById(@PathVariable Long id) {
         GameObjectResponse object = gameObjectService.getById(id);
         return ApiResponse.success("Object fetched successfully", object);
     }
 
-    // ----------------------------------------------------
-    // UPDATE OBJECT (ONLY OWNER CAN EDIT)
-    // PUT /object/{id}
-    // ----------------------------------------------------
+    /**
+     * Update object (only owner can edit)
+     */
     @PutMapping("/{id}")
     @PreAuthorize("@gameObjectPermission.canEdit(#id, authentication.principal.id)")
     public ApiResponse<GameObjectResponse> update(@PathVariable Long id, @Valid @RequestBody GameObjectUpdateRequest request) {
@@ -69,10 +64,9 @@ public class GameObjectController {
         return ApiResponse.success("Object updated successfully", updated);
     }
 
-    // ----------------------------------------------------
-    // DELETE OBJECT (ONLY OWNER CAN DELETE)
-    // DELETE /object/{id}
-    // ----------------------------------------------------
+    /**
+     * Delete object (only owner can delete)
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("@gameObjectPermission.canEdit(#id, authentication.principal.id)")
     public ApiResponse<Void> delete(@PathVariable Long id) {
